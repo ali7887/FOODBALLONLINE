@@ -75,5 +75,27 @@
   .tm-button:hover {
     @apply shadow-md transform scale-[1.02];
   }
+
+  /* Smooth micro-interactions */
+  .smooth-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .smooth-hover:hover {
+    @apply transform scale-[1.02] shadow-lg;
+  }
+
+  /* Mobile-friendly spacing */
+  @media (max-width: 768px) {
+    .container {
+      @apply px-4;
+    }
+  }
+
+  /* RTL-safe spacing */
+  [dir="rtl"] .space-x-reverse > * + * {
+    margin-right: 0;
+    margin-left: var(--space);
+  }
 }
 
