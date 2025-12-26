@@ -12,6 +12,8 @@ const Quiz = require('./Quiz');
 const Badge = require('./Badge');
 const UserBadge = require('./UserBadge');
 const ActivityLog = require('./ActivityLog');
+const Comment = require('./Comment');
+const Reaction = require('./Reaction');
 
 module.exports = {
   User,
@@ -26,6 +28,8 @@ module.exports = {
   Quiz,
   Badge,
   UserBadge,
-  ActivityLog
+  ActivityLog,
+  Comment,
+  Reaction
 };
 

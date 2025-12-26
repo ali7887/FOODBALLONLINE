@@ -31,6 +31,8 @@ app.use('/api/transfers', require('./routes/transfer.routes'));
 app.use('/api/rumors', require('./routes/rumor.routes'));
 app.use('/api/votes', require('./routes/vote.routes'));
 app.use('/api/gamification', require('./routes/gamification.routes'));
+app.use('/api/comments', require('./routes/comment.routes'));
+app.use('/api/reactions', require('./routes/reaction.routes'));
 
 // 404 handler
 app.use((req, res) => {

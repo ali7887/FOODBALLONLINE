@@ -21,7 +21,10 @@ const activityLogSchema = new mongoose.Schema({
       'badge_earned',
       'transfer_reported',
       'profile_updated',
-      'match_menu_voted'
+      'match_menu_voted',
+      'comment_created',
+      'reaction_added',
+      'user_mentioned'
     ]
   },
   action: {
