@@ -61,6 +61,9 @@ export function ActivityFeedPage() {
       ritual_created: Star,
       ritual_liked: Star,
       transfer_reported: Activity,
+      comment_created: MessageSquare,
+      reaction_added: TrendingUp,
+      user_mentioned: Award,
     };
     return iconMap[type] || Activity;
   }
@@ -72,6 +75,9 @@ export function ActivityFeedPage() {
       quiz_completed: 'text-yellow-600 bg-yellow-50',
       badge_earned: 'text-tm-green bg-tm-green/10',
       ritual_created: 'text-orange-600 bg-orange-50',
+      comment_created: 'text-tm-green bg-tm-green/10',
+      reaction_added: 'text-purple-600 bg-purple-50',
+      user_mentioned: 'text-blue-600 bg-blue-50',
     };
     return colorMap[type] || 'text-gray-600 bg-gray-50';
   }
@@ -80,6 +86,9 @@ export function ActivityFeedPage() {
     { value: '', label: 'همه فعالیت‌ها' },
     { value: 'vote_market_value', label: 'رأی به ارزش بازاری' },
     { value: 'vote_rumor_probability', label: 'رأی به شایعات' },
+    { value: 'comment_created', label: 'نظرات' },
+    { value: 'reaction_added', label: 'واکنش‌ها' },
+    { value: 'user_mentioned', label: 'منشن‌ها' },
     { value: 'quiz_completed', label: 'کویزها' },
     { value: 'badge_earned', label: 'نشان‌ها' },
     { value: 'ritual_created', label: 'ریتوال‌ها' },
