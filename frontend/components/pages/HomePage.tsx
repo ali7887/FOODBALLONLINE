@@ -28,8 +28,13 @@ export function HomePage() {
         setTrendingPlayers(playersRes.data?.players || []);
         setRumors(rumorsRes.data?.rumors || []);
         setLeaderboard(leaderboardRes.data?.leaderboard || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching data:', error);
+        // Silently handle errors - show empty states instead
+        // In production, you might want to show a toast notification
+        if (error.message?.includes('سرور در دسترس نیست')) {
+          console.warn('Backend server is not running. Showing empty states.');
+        }
       } finally {
         setLoading(false);
       }

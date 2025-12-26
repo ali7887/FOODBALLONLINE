@@ -57,12 +57,20 @@ class ApiClient {
   }
 
   private handleError(error: AxiosError) {
+    // Handle connection errors (backend not running)
+    if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.message.includes('socket hang up')) {
+      return new Error('سرور در دسترس نیست. لطفاً مطمئن شو که backend در حال اجرا است.');
+    }
+
     if (error.response) {
       // Server responded with error
       const message = (error.response.data as any)?.message || error.message;
       return new Error(message);
     } else if (error.request) {
       // Request made but no response
+      if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET') {
+        return new Error('سرور در دسترس نیست. لطفاً مطمئن شو که backend در حال اجرا است.');
+      }
       return new Error('خطای شبکه. لطفاً اتصال اینترنتت رو بررسی کن.');
     } else {
       // Something else happened
