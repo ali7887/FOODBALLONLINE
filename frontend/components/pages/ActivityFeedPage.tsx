@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,7 +28,7 @@ export function ActivityFeedPage() {
     fetchActivities();
   }, [page, activityType]);
 
-  async function fetchActivities() {
+  const fetchActivities = useCallback(async () => {
     setLoading(true);
     try {
       const response = await apiClient.getActivityFeed({
@@ -43,7 +43,10 @@ export function ActivityFeedPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [page, activityType]);
+
+  // Memoize activities list
+  const memoizedActivities = useMemo(() => activities, [activities]);
 
   function getActivityIcon(type: string) {
     const iconMap: { [key: string]: any } = {
@@ -153,7 +156,7 @@ export function ActivityFeedPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-gray-200">
-                {activities.map((activity: any) => {
+                {memoizedActivities.map((activity: any) => {
                   const Icon = getActivityIcon(activity.activityType);
                   const colorClass = getActivityColor(activity.activityType);
 

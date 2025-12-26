@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,7 +20,7 @@ export function LeaderboardPage() {
     fetchLeaderboard();
   }, [page]);
 
-  async function fetchLeaderboard() {
+  const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
     try {
       const response = await apiClient.getLeaderboard({
@@ -36,7 +36,10 @@ export function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [page]);
+
+  // Memoize leaderboard list
+  const memoizedLeaderboard = useMemo(() => leaderboard, [leaderboard]);
 
   function getRankIcon(rank: number) {
     if (rank === 1) return <Trophy className="h-6 w-6 text-yellow-500" />;
@@ -95,7 +98,7 @@ export function LeaderboardPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-gray-200">
-                {leaderboard.map((user, index) => {
+                {memoizedLeaderboard.map((user, index) => {
                   const rank = user.rank || index + 1;
                   const isCurrentUser = currentUser?._id === user._id;
 
@@ -115,7 +118,11 @@ export function LeaderboardPage() {
                           {getRankIcon(rank) || rank}
                         </div>
                         <Avatar className="h-12 w-12 border-2 border-gray-200">
-                          <AvatarImage src={user.avatar} />
+                          <AvatarImage 
+                            src={user.avatar} 
+                            loading="lazy"
+                            alt={user.displayName || user.username}
+                          />
                           <AvatarFallback className="bg-tm-green text-white">
                             {user.displayName?.[0] || user.username?.[0]}
                           </AvatarFallback>

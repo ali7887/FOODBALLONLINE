@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +13,13 @@ import { StatsCard } from '@/components/gamification/StatsCard';
 import { LevelIndicator } from '@/components/gamification/LevelIndicator';
 import { BadgeCard } from '@/components/gamification/BadgeCard';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Lazy load Avatar for better performance
+const LazyAvatar = dynamic(() => import('@/components/ui/avatar').then(mod => ({ default: mod.Avatar })), {
+  loading: () => <Skeleton className="h-24 w-24 rounded-full" />,
+  ssr: false,
+});
 
 export function ProfilePage() {
   const [progress, setProgress] = useState<any>(null);
@@ -43,7 +50,7 @@ export function ProfilePage() {
     }
   }
 
-  async function handleCheckBadges() {
+  const handleCheckBadges = useCallback(async () => {
     setCheckingBadges(true);
     try {
       await apiClient.checkBadges();
@@ -53,7 +60,13 @@ export function ProfilePage() {
     } finally {
       setCheckingBadges(false);
     }
-  }
+  }, []);
+
+  // Memoize badge list to prevent unnecessary re-renders
+  const memoizedBadges = useMemo(() => badges, [badges]);
+  
+  // Memoize activities list
+  const memoizedActivities = useMemo(() => activities, [activities]);
 
   if (loading) {
     return (
@@ -148,7 +161,11 @@ export function ProfilePage() {
           <CardContent className="p-6">
             <div className="flex items-center space-x-reverse space-x-6">
               <Avatar className="h-24 w-24 border-2 border-tm-green">
-                <AvatarImage src={user.avatar} />
+                <AvatarImage 
+                  src={user.avatar} 
+                  loading="lazy"
+                  alt={user.displayName || user.username}
+                />
                 <AvatarFallback className="bg-tm-green text-white text-2xl">
                   {user.displayName?.[0] || user.username?.[0]}
                 </AvatarFallback>
@@ -251,7 +268,7 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {badges.map((badge: any) => (
+                {memoizedBadges.map((badge: any) => (
                   <BadgeCard
                     key={badge._id}
                     badge={badge}
@@ -292,7 +309,7 @@ export function ProfilePage() {
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
-                {activities.map((activity: any, index: number) => (
+                {memoizedActivities.map((activity: any, index: number) => (
                   <div
                     key={activity._id}
                     className="flex items-center justify-between p-4 hover:bg-gray-50 transition-all duration-200 cursor-pointer group"
