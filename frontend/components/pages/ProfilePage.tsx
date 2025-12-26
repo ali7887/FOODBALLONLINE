@@ -32,7 +32,7 @@ export function ProfilePage() {
     fetchData();
   }, []);
 
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     try {
       const [progressRes, badgesRes, activitiesRes] = await Promise.all([
         apiClient.getProgress(),
@@ -43,12 +43,16 @@ export function ProfilePage() {
       setProgress(progressRes.data);
       setBadges(badgesRes.data?.badges || []);
       setActivities(activitiesRes.data?.activities || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching profile data:', error);
+      // Handle specific error cases
+      if (error?.response?.status === 401) {
+        // User not authenticated - ProtectedRoute will handle this
+      }
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   const handleCheckBadges = useCallback(async () => {
     setCheckingBadges(true);

@@ -38,8 +38,11 @@ export function ActivityFeedPage() {
       });
       setActivities(response.data?.activities || []);
       setTotalPages(response.data?.pagination?.pages || 1);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching activities:', error);
+      // Reset on error
+      setActivities([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }

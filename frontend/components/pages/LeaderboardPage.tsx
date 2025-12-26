@@ -31,8 +31,11 @@ export function LeaderboardPage() {
       });
       setLeaderboard(response.data?.leaderboard || []);
       setTotalPages(response.data?.pagination?.pages || 1);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching leaderboard:', error);
+      // Reset on error
+      setLeaderboard([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
