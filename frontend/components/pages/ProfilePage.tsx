@@ -12,6 +12,9 @@ import { Trophy, Award, TrendingUp, Activity, Star, CheckCircle } from 'lucide-r
 import { StatsCard } from '@/components/gamification/StatsCard';
 import { LevelIndicator } from '@/components/gamification/LevelIndicator';
 import { BadgeCard } from '@/components/gamification/BadgeCard';
+import { DailyChallenge } from '@/components/engagement/DailyChallenge';
+import { WeeklyBadge } from '@/components/engagement/WeeklyBadge';
+import { SmartCTA } from '@/components/engagement/SmartCTA';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
@@ -157,9 +160,47 @@ export function ProfilePage() {
   const { user, level, badgeCount, activityStats, totalActivities } = progress;
   const progressPercentage = (level.points % 100);
 
+  // Mock data for engagement features - replace with real API calls
+  const dailyChallenges = [
+    {
+      id: '1',
+      title: 'رأی دادن به بازیکنان',
+      description: 'به ۳ بازیکن رأی بده',
+      type: 'vote' as const,
+      target: 3,
+      current: activityStats.vote_market_value?.count || 0,
+      reward: 50,
+      completed: (activityStats.vote_market_value?.count || 0) >= 3,
+    },
+  ];
+
+  const weeklyBadge = {
+    id: 'weekly-1',
+    name: 'فعال هفتگی',
+    description: 'در این هفته ۱۰ فعالیت انجام بده',
+    icon: '🏅',
+    rarity: 'rare' as const,
+    earned: totalActivities >= 10,
+    timeRemaining: 2 * 86400 + 12 * 3600, // 2 days 12 hours
+  };
+
+  const userStats = {
+    hasVoted: (activityStats.vote_market_value?.count || 0) > 0,
+    hasBadge: badgeCount > 0,
+    hasActivity: totalActivities > 0,
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container space-y-6">
+        {/* Engagement Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DailyChallenge challenges={dailyChallenges} />
+          <WeeklyBadge badge={weeklyBadge} />
+        </div>
+
+        {/* Smart CTA */}
+        <SmartCTA userStats={userStats} />
         {/* User Header - Transfermarkt style */}
         <Card className="border-gray-200">
           <CardContent className="p-6">

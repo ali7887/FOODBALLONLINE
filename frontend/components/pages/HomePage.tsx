@@ -42,10 +42,10 @@ export function HomePage() {
     <div className="container py-8 space-y-8">
       {/* Hero Section */}
       <section className="text-center space-y-4 py-12">
-        <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-food-orange bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-6xl font-semibold text-gray-800" style={{ fontFamily: 'Vazirmatn, sans-serif' }}>
           به فوتبال آنلاین خوش آمدید ⚽
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           پلتفرم داده‌های فوتبال ایران با طعم کباب و پیتزا! بازیکنان را دنبال کن، نقل‌وانتقالات را ببین و برای صدر جدول بجنگ 🏆
         </p>
       </section>
