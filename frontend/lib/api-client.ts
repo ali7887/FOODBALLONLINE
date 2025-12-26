@@ -247,6 +247,57 @@ class ApiClient {
     const response = await this.client.get('/votes/my-votes', { params: { voteType } });
     return response.data;
   }
+
+  // Comment methods
+  async createComment(data: {
+    entityType: 'player' | 'rumor';
+    entityId: string;
+    content: string;
+  }) {
+    const response = await this.client.post('/comments', data);
+    return response.data;
+  }
+
+  async getComments(params: {
+    entityType: 'player' | 'rumor';
+    entityId: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const response = await this.client.get('/comments', { params });
+    return response.data;
+  }
+
+  async deleteComment(commentId: string) {
+    const response = await this.client.delete(`/comments/${commentId}`);
+    return response.data;
+  }
+
+  // Reaction methods
+  async toggleReaction(data: {
+    targetType: 'comment' | 'player' | 'rumor';
+    targetId: string;
+    type: 'like' | 'fire' | 'suspicious' | 'funny';
+  }) {
+    const response = await this.client.post('/reactions/toggle', data);
+    return response.data;
+  }
+
+  async getReactions(params: {
+    targetType: 'comment' | 'player' | 'rumor';
+    targetId: string;
+  }) {
+    const response = await this.client.get('/reactions', { params });
+    return response.data;
+  }
+
+  async getUserReaction(params: {
+    targetType: 'comment' | 'player' | 'rumor';
+    targetId: string;
+  }) {
+    const response = await this.client.get('/reactions/user', { params });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
