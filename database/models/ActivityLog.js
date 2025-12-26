@@ -33,7 +33,7 @@ const activityLogSchema = new mongoose.Schema({
   },
   targetType: {
     type: String,
-    enum: ['player', 'club', 'transfer', 'rumor', 'match', 'vote', 'quiz', 'ritual', 'badge', 'user'],
+    enum: ['player', 'club', 'transfer', 'rumor', 'match', 'vote', 'quiz', 'ritual', 'badge', 'user', 'comment'],
     index: true
   },
   targetId: {
