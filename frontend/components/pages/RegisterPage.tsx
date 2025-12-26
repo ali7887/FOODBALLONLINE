@@ -11,12 +11,15 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
 
-export function LoginPage() {
+export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     password: '',
+    confirmPassword: '',
+    displayName: '',
   });
   const router = useRouter();
   const { login, isAuthenticated, isLoading } = useAuthStore();
@@ -24,9 +27,7 @@ export function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/profile';
-      sessionStorage.removeItem('redirectAfterLogin');
-      router.push(redirectPath);
+      router.push('/profile');
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -35,20 +36,31 @@ export function LoginPage() {
     setLoading(true);
     setError(null);
 
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('رمز عبور و تکرار آن یکسان نیستند');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('رمز عبور باید حداقل ۶ کاراکتر باشد');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await apiClient.login({
+      const response = await apiClient.register({
         email: formData.email,
         password: formData.password,
+        username: formData.username,
+        displayName: formData.displayName || formData.username,
       });
 
       // Update auth store
       if (response.data?.token && response.data?.user) {
         login(response.data.token, response.data.user);
-        
-        // Redirect
-        const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/profile';
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectPath);
+        router.push('/profile');
       }
     } catch (error: any) {
       // Persian error messages
@@ -56,10 +68,12 @@ export function LoginPage() {
       
       if (error.message) {
         const message = error.message.toLowerCase();
-        if (message.includes('invalid credentials') || message.includes('نام کاربری یا رمز عبور')) {
-          errorMessage = 'نام کاربری یا رمز عبور اشتباه است';
-        } else if (message.includes('unauthorized')) {
-          errorMessage = 'برای ادامه، لطفاً وارد حساب کاربری شوید';
+        if (message.includes('email already') || message.includes('ایمیل')) {
+          errorMessage = 'این ایمیل قبلاً ثبت شده است';
+        } else if (message.includes('username') && message.includes('taken')) {
+          errorMessage = 'این نام کاربری قبلاً انتخاب شده است';
+        } else if (message.includes('validation')) {
+          errorMessage = 'لطفاً تمام فیلدهای الزامی را پر کن';
         } else {
           errorMessage = error.message;
         }
@@ -83,6 +97,7 @@ export function LoginPage() {
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
           </CardContent>
         </Card>
       </div>
@@ -95,9 +110,9 @@ export function LoginPage() {
         {/* Transfermarkt-style card */}
         <Card className="bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden">
           <CardHeader className="bg-tm-green text-white pb-4">
-            <CardTitle className="text-2xl font-bold text-center">ورود به حساب کاربری</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">ثبت‌نام</CardTitle>
             <CardDescription className="text-white/90 text-center mt-2">
-              اطلاعات حساب کاربری‌ات رو وارد کن
+              حساب کاربری جدید بساز و شروع کن
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
@@ -114,7 +129,20 @@ export function LoginPage() {
                 <table className="w-full">
                   <tbody>
                     <tr>
-                      <td>ایمیل</td>
+                      <td>نام کاربری *</td>
+                      <td>
+                        <Input
+                          placeholder="username"
+                          value={formData.username}
+                          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                          required
+                          className="w-full border-gray-300 focus:border-tm-green focus:ring-tm-green"
+                          disabled={loading}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ایمیل *</td>
                       <td>
                         <Input
                           type="email"
@@ -128,13 +156,40 @@ export function LoginPage() {
                       </td>
                     </tr>
                     <tr>
-                      <td>رمز عبور</td>
+                      <td>نام نمایشی</td>
+                      <td>
+                        <Input
+                          placeholder="نام نمایشی (اختیاری)"
+                          value={formData.displayName}
+                          onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                          className="w-full border-gray-300 focus:border-tm-green focus:ring-tm-green"
+                          disabled={loading}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>رمز عبور *</td>
                       <td>
                         <Input
                           type="password"
-                          placeholder="••••••••"
+                          placeholder="حداقل ۶ کاراکتر"
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          required
+                          minLength={6}
+                          className="w-full border-gray-300 focus:border-tm-green focus:ring-tm-green"
+                          disabled={loading}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>تکرار رمز عبور *</td>
+                      <td>
+                        <Input
+                          type="password"
+                          placeholder="رمز عبور را دوباره وارد کن"
+                          value={formData.confirmPassword}
+                          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                           required
                           className="w-full border-gray-300 focus:border-tm-green focus:ring-tm-green"
                           disabled={loading}
@@ -153,19 +208,19 @@ export function LoginPage() {
                 {loading ? (
                   <span className="flex items-center justify-center">
                     <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></span>
-                    در حال ورود...
+                    در حال ثبت‌نام...
                   </span>
                 ) : (
-                  'ورود'
+                  'ثبت‌نام'
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center space-y-3">
               <p className="text-sm text-gray-600">
-                حساب کاربری نداری؟{' '}
-                <Link href="/register" className="text-tm-green hover:text-tm-green/80 underline font-medium transition-colors">
-                  ثبت‌نام کن
+                قبلاً ثبت‌نام کردی؟{' '}
+                <Link href="/login" className="text-tm-green hover:text-tm-green/80 underline font-medium transition-colors">
+                  وارد شو
                 </Link>
               </p>
               <Link
@@ -181,3 +236,4 @@ export function LoginPage() {
     </div>
   );
 }
+

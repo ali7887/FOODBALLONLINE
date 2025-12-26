@@ -54,7 +54,14 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Football theme colors
+        // Transfermarkt-style colors
+        tm: {
+          green: '#2A9D41',
+          lightGreen: '#A7D129',
+          gray: '#F5F5F5',
+          border: '#E5E7EB',
+        },
+        // Football theme colors (kept for compatibility)
         pitch: {
           DEFAULT: '#0d4d2d',
           light: '#1a6b3a',

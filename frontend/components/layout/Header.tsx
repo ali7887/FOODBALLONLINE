@@ -30,13 +30,13 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center space-x-reverse space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-food-orange bg-clip-text text-transparent">
-            Foodball
+        <Link href="/" className="flex items-center space-x-reverse space-x-2 hover:opacity-80 transition-opacity">
+          <span className="text-2xl font-bold text-tm-green">
+            فوتبال
           </span>
-          <span className="text-sm text-muted-foreground">.online</span>
+          <span className="text-sm text-gray-600">.آنلاین</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-reverse space-x-6">
@@ -48,8 +48,8 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center space-x-reverse space-x-1 text-sm font-medium transition-colors hover:text-primary',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
+                  'flex items-center space-x-reverse space-x-1 text-sm font-medium transition-colors',
+                  isActive ? 'text-tm-green font-semibold' : 'text-gray-600 hover:text-tm-green'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -88,17 +88,25 @@ export function Header() {
                 size="sm"
                 onClick={handleLogout}
                 title="خروج"
+                className="border-gray-300 hover:border-red-300 hover:text-red-600"
               >
                 <LogOut className="h-4 w-4 ml-2" />
                 <span className="hidden md:inline">خروج</span>
               </Button>
             </>
           ) : (
-            <Link href="/login">
-              <Button variant="outline" size="sm">
-                ورود / ثبت‌نام
-              </Button>
-            </Link>
+            <div className="flex items-center space-x-reverse space-x-2">
+              <Link href="/login">
+                <Button variant="default" size="sm" className="bg-tm-green hover:bg-tm-green/90">
+                  ورود
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button variant="outline" size="sm">
+                  ثبت‌نام
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>
