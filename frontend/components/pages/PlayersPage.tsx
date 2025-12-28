@@ -1,16 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter, ModalClose } from '@/components/ui/modal';
+import { PlayerCard } from '@/components/players/PlayerCard';
 import { apiClient } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
-import { Search, Filter, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
+import { Search } from 'lucide-react';
 
 export function PlayersPage() {
   const [players, setPlayers] = useState<any[]>([]);
@@ -147,49 +146,17 @@ export function PlayersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {players.map((player) => (
-            <Card key={player._id} className="hover:border-primary transition-colors">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <Link href={`/players/${player._id}`}>
-                      <CardTitle className="hover:text-primary transition-colors cursor-pointer">
-                        {player.fullName}
-                      </CardTitle>
-                    </Link>
-                    <CardDescription>{player.position}</CardDescription>
-                  </div>
-                  {player.currentClub && (
-                    <Badge variant="outline">{player.currentClub.name}</Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">ارزش بازاری</span>
-                    <span className="text-lg font-bold text-primary">
-                      {formatCurrency(player.marketValue || 0)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{player.marketValueVoteCount || 0} رأی</span>
-                    <span>{player.stats?.goals || 0} گل</span>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    setSelectedPlayer(player);
-                    setVoteModalOpen(true);
-                  }}
-                >
-                  <TrendingUp className="h-4 w-4 ml-2" />
-                  رأی بده
-                </Button>
-              </CardContent>
-            </Card>
+            <PlayerCard
+              key={player._id}
+              player={player}
+              onVote={(playerId) => {
+                const player = players.find(p => p._id === playerId);
+                if (player) {
+                  setSelectedPlayer(player);
+                  setVoteModalOpen(true);
+                }
+              }}
+            />
           ))}
         </div>
       )}

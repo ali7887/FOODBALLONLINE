@@ -157,35 +157,7 @@ function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading 
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingPlayers.map((player) => (
-              <Link key={player._id} href={`/players/${player._id}`}>
-                <Card className="hover:border-primary transition-colors cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle>{player.fullName}</CardTitle>
-                        <CardDescription>{player.position}</CardDescription>
-                      </div>
-                      {player.currentClub && (
-                        <Badge variant="outline">{player.currentClub.name}</Badge>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">ارزش بازاری</span>
-                        <span className="text-lg font-bold text-primary">
-                          {formatCurrency(player.marketValue || 0)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{player.marketValueVoteCount || 0} رأی</span>
-                        <span>{player.stats?.goals || 0} گل</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <PlayerCard key={player._id} player={player} />
             ))}
           </div>
         )}

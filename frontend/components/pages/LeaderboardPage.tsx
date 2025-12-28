@@ -9,6 +9,7 @@ import { apiClient } from '@/lib/api-client';
 import { Trophy, Medal, Award } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserTitleBadge } from '@/components/profile/UserTitleBadge';
+import { TrendIndicator } from '@/components/leaderboard/TrendIndicator';
 import Link from 'next/link';
 
 export function LeaderboardPage() {
@@ -47,16 +48,16 @@ export function LeaderboardPage() {
   const memoizedLeaderboard = useMemo(() => leaderboard, [leaderboard]);
 
   function getRankIcon(rank: number) {
-    if (rank === 1) return <Trophy className="h-6 w-6 text-yellow-500" />;
-    if (rank === 2) return <Medal className="h-6 w-6 text-gray-400" />;
-    if (rank === 3) return <Award className="h-6 w-6 text-amber-600" />;
+    if (rank === 1) return '🥇';
+    if (rank === 2) return '🥈';
+    if (rank === 3) return '🥉';
     return null;
   }
 
   function getRankBadgeColor(rank: number) {
-    if (rank === 1) return 'bg-yellow-500 text-white';
-    if (rank === 2) return 'bg-gray-400 text-white';
-    if (rank === 3) return 'bg-amber-600 text-white';
+    if (rank === 1) return 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg';
+    if (rank === 2) return 'bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md';
+    if (rank === 3) return 'bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-md';
     return 'bg-gray-200 text-gray-700';
   }
 
@@ -120,7 +121,9 @@ export function LeaderboardPage() {
                         <div
                           className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg ${getRankBadgeColor(rank)}`}
                         >
-                          {getRankIcon(rank) || rank}
+                          {getRankIcon(rank) || (
+                            <span className="text-base" dir="ltr">{rank}</span>
+                          )}
                         </div>
                         <Avatar className="h-12 w-12 border-2 border-gray-200">
                           <AvatarImage 
@@ -155,11 +158,16 @@ export function LeaderboardPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-left">
-                        <div className="text-2xl font-bold text-tm-green">
-                          {user.points || 0}
+                      <div className="text-left flex items-center gap-3">
+                        <div>
+                          <div className="text-2xl font-bold text-tm-green" dir="ltr">
+                            {user.points?.toLocaleString('fa-IR') || 0}
+                          </div>
+                          <div className="text-xs text-gray-500">امتیاز</div>
                         </div>
-                        <div className="text-xs text-gray-500">امتیاز</div>
+                        {user.rankChange !== undefined && (
+                          <TrendIndicator change={user.rankChange} />
+                        )}
                       </div>
                     </div>
                   );
