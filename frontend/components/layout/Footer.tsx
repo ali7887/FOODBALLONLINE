@@ -5,11 +5,20 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:items-end">
             <p className="text-sm text-gray-600">
-              © {new Date().getFullYear()} فوتبال آنلاین. تمامی حقوق محفوظ است.
+              © {new Date().getFullYear()} فودبال آنلاین. تمامی حقوق محفوظ است.
             </p>
             <p className="text-xs text-gray-500">
-              پلتفرم داده‌های فوتبال ایران با گیمیفیکیشن غذامحور
-            </p>
+  پلتفرم داده‌های فوتبال ایران با گیمیفیکیشن غذامحور – طراحی و اجرا توسط{" "}
+  <a
+    href="https://alikiani.vercel.app/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="font-semibold text-[#2A9D41] hover:underline transition-colors"
+  >
+    علی کیانی
+  </a>
+</p>
+
           </div>
           <div className="flex items-center space-x-reverse space-x-4 text-sm text-gray-500">
             <span>⚽ 🍕</span>
