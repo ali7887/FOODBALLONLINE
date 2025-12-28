@@ -3,6 +3,8 @@ export interface CommentAuthor {
   username: string;
   displayName?: string;
   avatar?: string;
+  title?: string;
+  reputation?: number;
 }
 
 export interface Comment {

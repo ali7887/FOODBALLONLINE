@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api-client';
 import { Trophy, Medal, Award } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { UserTitleBadge } from '@/components/profile/UserTitleBadge';
+import Link from 'next/link';
 
 export function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
@@ -131,10 +133,16 @@ export function LeaderboardPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="flex items-center space-x-reverse space-x-2">
-                            <span className="font-semibold text-gray-900">
+                          <div className="flex items-center space-x-reverse space-x-2 flex-wrap gap-1">
+                            <Link
+                              href={`/users/${user.username}`}
+                              className="font-semibold text-gray-900 hover:text-tm-green transition-colors"
+                            >
                               {user.displayName || user.username}
-                            </span>
+                            </Link>
+                            {user.title && (
+                              <UserTitleBadge title={user.title as any} size="sm" />
+                            )}
                             {isCurrentUser && (
                               <span className="text-xs bg-tm-green text-white px-2 py-0.5 rounded">
                                 شما

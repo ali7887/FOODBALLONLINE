@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LikeButton } from './LikeButton';
 import { MentionText } from './MentionText';
+import { UserTitleBadge } from '@/components/profile/UserTitleBadge';
 import { Trash2, Reply } from 'lucide-react';
 import { commentsApi } from '@/lib/api/comments';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -61,9 +62,17 @@ export function CommentItem({ comment, onDelete, onReply, showReplies = true }: 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="font-semibold text-gray-900 text-sm">
-                  {comment.author.displayName || comment.author.username}
-                </p>
+                <div className="flex items-center space-x-reverse space-x-2 mb-1 flex-wrap gap-1">
+                  <Link
+                    href={`/users/${comment.author.username}`}
+                    className="font-semibold text-gray-900 text-sm hover:text-tm-green transition-colors"
+                  >
+                    {comment.author.displayName || comment.author.username}
+                  </Link>
+                  {comment.author.title && (
+                    <UserTitleBadge title={comment.author.title as any} size="sm" />
+                  )}
+                </div>
                 <p className="text-xs text-gray-500">{timeAgo}</p>
               </div>
               
