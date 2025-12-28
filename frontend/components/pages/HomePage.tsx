@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayerCard } from '@/components/players/PlayerCard';
 import { TransferRumorCard } from '@/components/rumors/TransferRumorCard';
 import { apiClient } from '@/lib/api-client';
 import { PersonalizedFeed } from '@/components/feed/PersonalizedFeed';
-import { formatCurrency } from '@/lib/utils';
-import { TrendingUp, Users, Trophy, Sparkles } from 'lucide-react';
+import { HeroSection } from '@/components/home/HeroSection';
+import { QuickStatsBar } from '@/components/home/QuickStatsBar';
+import { SectionHeader } from '@/components/home/SectionHeader';
+import { FeaturedMatchMenu } from '@/components/home/FeaturedMatchMenu';
+import { LeaderboardPreview } from '@/components/home/LeaderboardPreview';
+import { TrendingUp, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -19,6 +22,13 @@ export function HomePage() {
   const [trendingPlayers, setTrendingPlayers] = useState<any[]>([]);
   const [rumors, setRumors] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [featuredMatch, setFeaturedMatch] = useState<any>(null);
+  const [stats, setStats] = useState({
+    totalPlayers: 0,
+    totalVotes: 0,
+    activeUsers: 0,
+    hotRumors: 0,
+  });
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuthStore();
 
@@ -34,10 +44,19 @@ export function HomePage() {
         setTrendingPlayers(playersRes.data?.players || []);
         setRumors(rumorsRes.data?.rumors || []);
         setLeaderboard(leaderboardRes.data?.leaderboard || []);
+
+        // Calculate stats
+        setStats({
+          totalPlayers: playersRes.data?.pagination?.total || 0,
+          totalVotes: (playersRes.data?.players || []).reduce((sum: number, p: any) => sum + (p.marketValueVoteCount || 0), 0),
+          activeUsers: leaderboardRes.data?.pagination?.total || 0,
+          hotRumors: (rumorsRes.data?.rumors || []).filter((r: any) => r.probability >= 70).length,
+        });
+
+        // TODO: Fetch featured match from API when available
+        // For now, we'll skip it
       } catch (error: any) {
         console.error('Error fetching data:', error);
-        // Silently handle errors - show empty states instead
-        // In production, you might want to show a toast notification
         if (error.message?.includes('سرور در دسترس نیست')) {
           console.warn('Backend server is not running. Showing empty states.');
         }
@@ -50,55 +69,48 @@ export function HomePage() {
   }, []);
 
   return (
-    <div className="container py-8 space-y-8">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="text-center space-y-4 py-12">
-        <h1 className="text-4xl md:text-6xl font-semibold text-gray-800" style={{ fontFamily: 'Vazirmatn, sans-serif' }}>
-          به فودبال آنلاین خوش آمدید ⚽
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          پلتفرم داده‌های فوتبال ایران با طعم کباب و پیتزا! بازیکنان را دنبال کن، نقل‌وانتقالات را ببین و برای صدر جدول بجنگ 🏆
-        </p>
-      </section>
+      <HeroSection match={featuredMatch} />
+
+      {/* Quick Stats Bar */}
+      <QuickStatsBar stats={stats} />
 
       {/* Personalized Feed Tab (for authenticated users) */}
       {isAuthenticated && (
-        <Tabs defaultValue="personalized" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="personalized" className="flex items-center space-x-reverse space-x-2">
-              <Sparkles className="h-4 w-4" />
-              <span>فید شخصی‌سازی شده</span>
-            </TabsTrigger>
-            <TabsTrigger value="general" className="flex items-center space-x-reverse space-x-2">
-              <TrendingUp className="h-4 w-4" />
-              <span>همه محتوا</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="personalized" className="space-y-6">
-            <Card className="border-gray-200">
-              <CardHeader className="bg-tm-green text-white">
-                <CardTitle className="flex items-center space-x-reverse space-x-2">
-                  <Sparkles className="h-5 w-5" />
+        <section className="py-8 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <Tabs defaultValue="personalized" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 max-w-md mx-auto">
+                <TabsTrigger value="personalized" className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
                   <span>فید شخصی‌سازی شده</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <PersonalizedFeed showFilters={true} showSortOptions={true} />
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </TabsTrigger>
+                <TabsTrigger value="general" className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>همه محتوا</span>
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="general" className="space-y-6">
-            {/* General content sections */}
-            <GeneralContentSections
-              trendingPlayers={trendingPlayers}
-              rumors={rumors}
-              leaderboard={leaderboard}
-              loading={loading}
-            />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="personalized" className="space-y-6">
+                <Card className="border-gray-200">
+                  <CardContent className="p-6">
+                    <PersonalizedFeed showFilters={true} showSortOptions={true} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="general" className="space-y-6">
+                <GeneralContentSections
+                  trendingPlayers={trendingPlayers}
+                  rumors={rumors}
+                  leaderboard={leaderboard}
+                  loading={loading}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </section>
       )}
 
       {/* General Content (for non-authenticated users) */}
@@ -110,6 +122,12 @@ export function HomePage() {
           loading={loading}
         />
       )}
+
+      {/* Featured Match Menu */}
+      {featuredMatch && <FeaturedMatchMenu match={featuredMatch} />}
+
+      {/* Leaderboard Preview */}
+      {leaderboard.length > 0 && <LeaderboardPreview topUsers={leaderboard} />}
     </div>
   );
 }
@@ -124,142 +142,90 @@ interface GeneralContentSectionsProps {
 function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading }: GeneralContentSectionsProps) {
   return (
     <>
-      {/* Trending Players */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-reverse space-x-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <h2 className="text-2xl font-bold">بازیکنان داغ 🔥</h2>
-          </div>
-          <Link href="/players">
-            <Button variant="outline">مشاهده همه</Button>
-          </Link>
-        </div>
+      {/* Featured Players */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <SectionHeader
+            title="بازیکنان برتر"
+            subtitle="بر اساس ارزش بازار"
+            icon="⭐"
+            action={
+              <Link href="/players" className="text-tm-green hover:underline text-sm font-medium">
+                مشاهده همه ←
+              </Link>
+            }
+          />
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="border-gray-200">
-                <CardContent className="p-4">
-                  <Skeleton className="h-6 w-32 mb-2" />
-                  <Skeleton className="h-48 w-full mb-2" />
-                  <Skeleton className="h-4 w-24 mb-4" />
-                  <Skeleton className="h-8 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : trendingPlayers.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-muted-foreground">هنوز بازیکنی اضافه نشده، تو شروعش کن 😉</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingPlayers.map((player) => (
-              <PlayerCard key={player._id} player={player} />
-            ))}
-          </div>
-        )}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="border-gray-200">
+                  <CardContent className="p-4">
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-48 w-full mb-2" />
+                    <Skeleton className="h-4 w-24 mb-4" />
+                    <Skeleton className="h-8 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : trendingPlayers.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <p className="text-muted-foreground">هنوز بازیکنی اضافه نشده، تو شروعش کن 😉</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trendingPlayers.map((player) => (
+                <PlayerCard key={player._id} player={player} />
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Hot Rumors */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-reverse space-x-2">
-            <Users className="h-5 w-5 text-food-orange" />
-            <h2 className="text-2xl font-bold">شایعات داغ نقل‌وانتقالات 🔥</h2>
-          </div>
-          <Link href="/rumors">
-            <Button variant="outline">مشاهده همه</Button>
-          </Link>
+      {/* Hot Transfer Rumors */}
+      <section className="py-16 bg-gradient-to-br from-red-50 to-orange-50">
+        <div className="container mx-auto px-4">
+          <SectionHeader
+            title="شایعات داغ"
+            subtitle="احتمال بالای انتقال"
+            icon="🔥"
+            action={
+              <Link href="/rumors" className="text-tm-green hover:underline text-sm font-medium">
+                مشاهده همه ←
+              </Link>
+            }
+          />
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="border-gray-200">
+                  <CardContent className="p-4">
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24 mb-4" />
+                    <Skeleton className="h-20 w-full mb-2" />
+                    <Skeleton className="h-8 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : rumors.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <p className="text-muted-foreground">هنوز شایعه‌ای ثبت نشده، تو اولین شایعه رو ثبت کن! 🍕</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {rumors.map((rumor) => (
+                <TransferRumorCard key={rumor._id} rumor={rumor} />
+              ))}
+            </div>
+          )}
         </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="border-gray-200">
-                <CardContent className="p-4">
-                  <Skeleton className="h-6 w-32 mb-2" />
-                  <Skeleton className="h-4 w-24 mb-4" />
-                  <Skeleton className="h-20 w-full mb-2" />
-                  <Skeleton className="h-8 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : rumors.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-muted-foreground">هنوز شایعه‌ای ثبت نشده، تو اولین شایعه رو ثبت کن! 🍕</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {rumors.map((rumor) => (
-              <TransferRumorCard key={rumor._id} rumor={rumor} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Leaderboard Preview */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-reverse space-x-2">
-            <Trophy className="h-5 w-5 text-food-yellow" />
-            <h2 className="text-2xl font-bold">برترین‌ها 🏆</h2>
-          </div>
-          <Link href="/leaderboard">
-            <Button variant="outline">مشاهده جدول کامل</Button>
-          </Link>
-        </div>
-
-        {loading ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-reverse space-x-4">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <Skeleton className="h-4 flex-1" />
-                    <Skeleton className="h-4 w-20" />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ) : leaderboard.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-muted-foreground">هنوز کسی امتیازی نگرفته، تو اولین نفر باش! 💪</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                {leaderboard.map((user, index) => (
-                  <div key={user._id} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-reverse space-x-4">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <p className="font-medium">{user.displayName || user.username}</p>
-                        <p className="text-sm text-muted-foreground">سطح {user.level || 1}</p>
-                      </div>
-                    </div>
-                    <div className="text-left">
-                      <p className="font-bold text-food-yellow">{user.points || 0} امتیاز</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </section>
     </>
   );
