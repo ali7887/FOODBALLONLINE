@@ -4,17 +4,21 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiClient } from '@/lib/api-client';
+import { PersonalizedFeed } from '@/components/feed/PersonalizedFeed';
 import { formatCurrency } from '@/lib/utils';
-import { TrendingUp, Users, Trophy } from 'lucide-react';
+import { TrendingUp, Users, Trophy, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export function HomePage() {
   const [trendingPlayers, setTrendingPlayers] = useState<any[]>([]);
   const [rumors, setRumors] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -55,6 +59,69 @@ export function HomePage() {
         </p>
       </section>
 
+      {/* Personalized Feed Tab (for authenticated users) */}
+      {isAuthenticated && (
+        <Tabs defaultValue="personalized" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="personalized" className="flex items-center space-x-reverse space-x-2">
+              <Sparkles className="h-4 w-4" />
+              <span>فید شخصی‌سازی شده</span>
+            </TabsTrigger>
+            <TabsTrigger value="general" className="flex items-center space-x-reverse space-x-2">
+              <TrendingUp className="h-4 w-4" />
+              <span>همه محتوا</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="personalized" className="space-y-6">
+            <Card className="border-gray-200">
+              <CardHeader className="bg-tm-green text-white">
+                <CardTitle className="flex items-center space-x-reverse space-x-2">
+                  <Sparkles className="h-5 w-5" />
+                  <span>فید شخصی‌سازی شده</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <PersonalizedFeed showFilters={true} showSortOptions={true} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="general" className="space-y-6">
+            {/* General content sections */}
+            <GeneralContentSections
+              trendingPlayers={trendingPlayers}
+              rumors={rumors}
+              leaderboard={leaderboard}
+              loading={loading}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {/* General Content (for non-authenticated users) */}
+      {!isAuthenticated && (
+        <GeneralContentSections
+          trendingPlayers={trendingPlayers}
+          rumors={rumors}
+          leaderboard={leaderboard}
+          loading={loading}
+        />
+      )}
+    </div>
+  );
+}
+
+interface GeneralContentSectionsProps {
+  trendingPlayers: any[];
+  rumors: any[];
+  leaderboard: any[];
+  loading: boolean;
+}
+
+function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading }: GeneralContentSectionsProps) {
+  return (
+    <>
       {/* Trending Players */}
       <section>
         <div className="flex items-center justify-between mb-6">
@@ -256,6 +323,6 @@ export function HomePage() {
           </Card>
         )}
       </section>
-    </div>
+    </>
   );
 }

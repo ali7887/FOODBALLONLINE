@@ -6,7 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 let authStore: any = null;
 
 // Base types for pagination and sorting
-interface BaseQueryParams {
+export interface BaseQueryParams {
   page?: number;
   limit?: number;
   sortBy?: string;
