@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { activityApi } from '@/lib/api/activity';
 import type { Activity, ActivityType, GetActivityParams } from '@/types/activity';
-import { MessageSquare, Heart, Award, TrendingUp, AtSign } from 'lucide-react';
+import { MessageSquare, Heart, Award, TrendingUp, AtSign, UserPlus, UserMinus, type LucideIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { faIR } from 'date-fns/locale';
 
@@ -47,24 +47,28 @@ export function ActivityFeed({ activityType, limit = 20, showFilter = false }: A
     fetchActivities();
   }, [fetchActivities]);
 
-  const getActivityIcon = (type: ActivityType) => {
-    const iconMap: Record<ActivityType, typeof MessageSquare> = {
+  const getActivityIcon = (type: ActivityType): LucideIcon => {
+    const iconMap: Record<ActivityType, LucideIcon> = {
       COMMENT_CREATED: MessageSquare,
       RUMOR_LIKED: Heart,
       BADGE_EARNED: Award,
       VOTE_SUBMITTED: TrendingUp,
       USER_MENTIONED: AtSign,
+      USER_FOLLOWED: UserPlus,
+      USER_UNFOLLOWED: UserMinus,
     };
     return iconMap[type] || MessageSquare;
   };
 
-  const getActivityColor = (type: ActivityType) => {
+  const getActivityColor = (type: ActivityType): string => {
     const colorMap: Record<ActivityType, string> = {
       COMMENT_CREATED: 'text-tm-green bg-tm-green/10',
       RUMOR_LIKED: 'text-red-600 bg-red-50',
       BADGE_EARNED: 'text-yellow-600 bg-yellow-50',
       VOTE_SUBMITTED: 'text-blue-600 bg-blue-50',
       USER_MENTIONED: 'text-purple-600 bg-purple-50',
+      USER_FOLLOWED: 'text-tm-green bg-tm-green/10',
+      USER_UNFOLLOWED: 'text-gray-600 bg-gray-50',
     };
     return colorMap[type] || 'text-gray-600 bg-gray-50';
   };
@@ -201,4 +205,3 @@ export function ActivityFeed({ activityType, limit = 20, showFilter = false }: A
     </div>
   );
 }
-
