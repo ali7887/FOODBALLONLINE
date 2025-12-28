@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TransferRumorCard } from '@/components/rumors/TransferRumorCard';
 import { apiClient } from '@/lib/api-client';
-import { formatCurrency } from '@/lib/utils';
 
 export function RumorsPage() {
   const [rumors, setRumors] = useState<any[]>([]);

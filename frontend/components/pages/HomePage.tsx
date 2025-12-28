@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PlayerCard } from '@/components/players/PlayerCard';
+import { TransferRumorCard } from '@/components/rumors/TransferRumorCard';
 import { apiClient } from '@/lib/api-client';
 import { PersonalizedFeed } from '@/components/feed/PersonalizedFeed';
 import { formatCurrency } from '@/lib/utils';
@@ -137,12 +139,11 @@ function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
+              <Card key={i} className="border-gray-200">
+                <CardContent className="p-4">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-48 w-full mb-2" />
+                  <Skeleton className="h-4 w-24 mb-4" />
                   <Skeleton className="h-8 w-full" />
                 </CardContent>
               </Card>
@@ -178,12 +179,12 @@ function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-32" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full" />
+              <Card key={i} className="border-gray-200">
+                <CardContent className="p-4">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-24 mb-4" />
+                  <Skeleton className="h-20 w-full mb-2" />
+                  <Skeleton className="h-8 w-full" />
                 </CardContent>
               </Card>
             ))}
@@ -197,42 +198,7 @@ function GeneralContentSections({ trendingPlayers, rumors, leaderboard, loading 
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {rumors.map((rumor) => (
-              <Link key={rumor._id} href={`/rumors/${rumor._id}`}>
-                <Card className="hover:border-food-orange transition-colors cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">
-                          {rumor.player?.fullName || 'بازیکن نامشخص'}
-                        </CardTitle>
-                        <CardDescription>
-                          {rumor.fromClub?.name || 'آزاد'} → {rumor.toClub?.name}
-                        </CardDescription>
-                      </div>
-                      <Badge
-                        variant={rumor.probability >= 70 ? 'success' : 'secondary'}
-                        className="text-xs"
-                      >
-                        {rumor.probability}%
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="w-full bg-secondary rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${rumor.probability}%` }}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{rumor.voteCount || 0} رأی</span>
-                        <span>{rumor.upvotes || 0} موافق</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <TransferRumorCard key={rumor._id} rumor={rumor} />
             ))}
           </div>
         )}
