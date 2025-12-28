@@ -263,6 +263,7 @@ class ApiClient {
     entityType: 'player' | 'rumor';
     entityId: string;
     content: string;
+    parentId?: string;
   }) {
     const response = await this.client.post('/comments', data);
     return response.data;
