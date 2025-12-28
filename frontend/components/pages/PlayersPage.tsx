@@ -121,12 +121,11 @@ export function PlayersPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(12)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-24" />
-              </CardHeader>
-              <CardContent>
+            <Card key={i} className="border-gray-200">
+              <CardContent className="p-4">
+                <Skeleton className="h-6 w-32 mb-2" />
+                <Skeleton className="h-48 w-full mb-2" />
+                <Skeleton className="h-4 w-24 mb-4" />
                 <Skeleton className="h-8 w-full" />
               </CardContent>
             </Card>
